@@ -1,5 +1,20 @@
 import socket
-import time
+import threading
+
+
+def handle_each_client(client_socket: socket.socket, client_address):
+    while True:
+        data_from_client = client_socket.recv(1024)
+        decoded_data_from_client = data_from_client.decode()
+        if decoded_data_from_client == 'Disconnect':
+            print(f'Client {client_address} Disconnect.')
+            break
+        else:
+            print(f'Received data : {decoded_data_from_client}, from {client_address}.')
+            encoded_data_to_client = f'Client {client_address}, server got your message.'.encode()
+            client_socket.sendall(encoded_data_to_client)
+
+    client_socket.close()
 
 
 def running_server_on_tcp_socket(server_ip_address, port_number, number_of_listeners):
@@ -9,9 +24,12 @@ def running_server_on_tcp_socket(server_ip_address, port_number, number_of_liste
 
     print(f'Server is up and running on ip : {server_ip_address} and port : {port_number}.')
 
-    return server_socket
+    while True:
+        client_socket, client_address = server_socket.accept()
+        print(f'Server got connection from {client_address}')
+        client_thread = threading.Thread(target=handle_each_client, args=(client_socket, client_address))
+        client_thread.start()
 
 
-
-
-
+if __name__ == '__main__':
+    running_server_on_tcp_socket('127.0.0.1', 44111, 5)
