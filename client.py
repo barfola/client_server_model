@@ -1,4 +1,5 @@
 import socket
+from helper import send_data, receive_data
 
 
 def running_client_on_tcp_socket(server_ip_address, port_number):
@@ -9,8 +10,7 @@ def running_client_on_tcp_socket(server_ip_address, port_number):
 
     while True:
         data_to_server = input('Insert message : ')
-        encoded_data_to_server = data_to_server.encode()
-        client_socket.send(encoded_data_to_server)
+        send_data(client_socket, data_to_server)
 
         if data_to_server == 'Disconnect':
             break

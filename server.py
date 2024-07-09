@@ -1,18 +1,19 @@
 import socket
 import threading
+from helper import send_data, receive_data
 
 
 def handle_each_client(client_socket: socket.socket, client_address):
     while True:
-        data_from_client = client_socket.recv(1024)
-        decoded_data_from_client = data_from_client.decode()
-        if decoded_data_from_client == 'Disconnect':
+        data_from_client = receive_data(client_socket)
+
+        if data_from_client == 'Disconnect':
             print(f'Client {client_address} Disconnect.')
             break
         else:
-            print(f'Received data : {decoded_data_from_client}, from {client_address}.')
-            encoded_data_to_client = f'Client {client_address}, server got your message.'.encode()
-            client_socket.sendall(encoded_data_to_client)
+            print(f'Received data : {data_from_client}, from {client_address}.')
+            data_to_client = f'Client {client_address}, server got your message.'
+            send_data(client_socket, data_to_client)
 
     client_socket.close()
 
