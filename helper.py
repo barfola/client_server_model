@@ -15,9 +15,15 @@ def create_file(file_path, data):
 
 def send_data(socket_connection: socket.socket, data: str):
     data_length_in_binary = len(data).to_bytes(4, byteorder='big')
-    socket_connection.sendall(data_length_in_binary)
     encoded_data = data.encode()
-    socket_connection.sendall(encoded_data)
+    try:
+        socket_connection.sendall(data_length_in_binary)
+        socket_connection.sendall(encoded_data)
+    except ConnectionAbortedError:
+        print('> Connection error during data delivering.')
+
+    except Exception:
+        print('> Connection error during data delivering.')
 
 
 def receive_data(socket_connection: socket.socket):
@@ -30,11 +36,11 @@ def receive_data(socket_connection: socket.socket):
             data += data_chunk
 
         except RuntimeError:
-            print('Data is not sent fully, connection closed before full message was sent.')
+            print('> Data is not sent fully, connection closed before full message was sent.')
             return None
 
         except Exception:
-            print('Error occurred when receiving data.')
+            print('> Error occurred when receiving data.')
             return None
 
     decoded_data = data.decode()
@@ -55,12 +61,12 @@ def get_fixed_string(user_string, lower=False, strip=True, capitalize=False):
 
 
 def get_file_path():
-    file_path = input('Insert file path : ')
+    file_path = input('> Insert file path : ')
     return file_path
 
 
 def get_directory_path():
-    directory_path = input('Insert directory path : ')
+    directory_path = input('> Insert directory path, for download the file : ')
     return directory_path
 
 
